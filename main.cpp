@@ -1,18 +1,20 @@
-/* mbed Microcontroller Library
- * Copyright (c) 2019 ARM Limited
- * SPDX-License-Identifier: Apache-2.0
- */
-
+/**
+* @file main.cpp
+* @brief Implementation of the TCS34725 chip for ARM embed projects
+* @author Jan-Willem Smaal  <usenet@gispen.org>
+* @date 7/16/2020 
+*/
 #include "mbed.h"
 #include "platform/mbed_thread.h"
 
-/* TCS34725 color driver by Jan-Willem Smaal <usenet@gispen.org>  */
+// TCS34725 color driver by Jan-Willem Smaal <usenet@gispen.org>  
 #include "color_tcs34725.h" 
 
 // Default is 9600 8N1  This is a global  
 Serial pc(USBTX, USBRX, "Color", 38400); // tx, rx 
 
-// Blinking rate in milliseconds
+// Blinking rate in milliseconds we adjust to the actual 
+// integration time of the sensor below. 
 #define RATE_MS 24
 
 
@@ -22,7 +24,7 @@ int main()
     color.setIntegration(INT_24MS );
     color.setGain(GAIN_16X);
 
- 
+    // Start with no color. 
     pc.printf("C %5.5u R %5.5u G %5.5u B %5.5u\n", 
                 color.c, 
                 color.r, 
@@ -31,8 +33,9 @@ int main()
 
     // Initialise the digital pin LED1 as an output
     DigitalOut led(LED1);
-    DigitalOut led20(P0_20);
 
+    // Pin20 is connected to the lighting bright LED on the sensor board. 
+    DigitalOut led20(P0_20);
     led20 = 0; 
 
     while (true) {
@@ -49,3 +52,5 @@ int main()
         thread_sleep_for(RATE_MS*2);
     }
 }
+
+/* EOF main.cpp */
