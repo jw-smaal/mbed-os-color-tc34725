@@ -20,35 +20,56 @@ Serial pc(USBTX, USBRX, "Color", 38400); // tx, rx
 
 int main()
 {
+    // Setup Color sensor  
     Color color; 
     color.setIntegration(INT_24MS );
     color.setGain(GAIN_16X);
 
-    // Start with no color. 
-    pc.printf("C %5.5u R %5.5u G %5.5u B %5.5u\n", 
-                color.c, 
-                color.r, 
-                color.g,
-                color.b );
 
-    // Initialise the digital pin LED1 as an output
+    // Outputs:  
     DigitalOut led(LED1);
 
     // Pin20 is connected to the lighting bright LED on the sensor board. 
-    DigitalOut led20(P0_20);
-    led20 = 0; 
+    DigitalOut sensorLed(P0_0);
+    sensorLed = 0; 
 
+    // Inputs:
+    BusIn buttons(BUTTON1, BUTTON2, BUTTON3, BUTTON4);
+    buttons.mode(PullUp);
+
+    BusOut keyCol(P0_12, P0_13, P0_14, P0_15); 
+    BusIn  keyRow(P0_16, P0_17, P0_18, P0_19); 
+    keyRow.mode(PullNone);
+
+    keyCol[0] = 1;
+    keyCol[1] = 0;   
+    keyCol[2] = 0;
+    keyCol[3] = 0;
+            
+
+    AnalogIn sensor(P0_1); 
+
+  
+ 
     while (true) {
         led = !led;
         
-        led20 = 1;
+        sensorLed = 1;
         thread_sleep_for(RATE_MS*2);
-        pc.printf("C %5.5u R %5.5u G %5.5u B %5.5u\n", 
+
+        // Activate Colums based on ButtonState 
+        keyCol = ~buttons.read();
+
+        pc.printf("C %5.5u R %5.5u G %5.5u B %5.5u W %5.5u K %2.2X keyCol %2.2X\n", 
                 color.getC(), 
                 color.getR(), 
                 color.getG(),
-                color.getB() );
-        led20 = 0;
+                color.getB(),
+                sensor.read_u16(),
+                keyRow.read(),
+                keyCol.read()
+        );
+        sensorLed = 0;
         thread_sleep_for(RATE_MS*2);
     }
 }
