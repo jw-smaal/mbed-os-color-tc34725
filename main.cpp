@@ -12,7 +12,6 @@
 // Default is 9600 8N1  This is a global  
 Serial pc(USBTX, USBRX, "Color", 38400); // tx, rx 
 
-
 // Blinking rate in milliseconds
 #define RATE_MS 24
 
